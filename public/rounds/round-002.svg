@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Curated TimeGuessr archive-style placeholder 02">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="22"/></filter>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+  <circle cx="1220" cy="210" r="180" fill="#facc15" opacity="0.20" filter="url(#soft)"/>
+  <rect x="0" y="705" width="1600" height="295" fill="#020617" opacity="0.45"/>
+  <g fill="#e2e8f0" opacity="0.18">
+    <rect x="120" y="560" width="110" height="300" rx="12"/>
+    <rect x="275" y="470" width="150" height="390" rx="12"/>
+    <rect x="470" y="615" width="110" height="245" rx="12"/>
+    <rect x="1060" y="500" width="160" height="360" rx="12"/>
+    <rect x="1260" y="600" width="110" height="260" rx="12"/>
+  </g>
+  <g fill="none" stroke="#facc15" stroke-width="10" stroke-linecap="round" opacity="0.88">
+    <path d="M220 760 C430 560 530 310 800 430 S1125 760 1380 540"/>
+    <path d="M300 835 H1300" opacity="0.7"/>
+    <path d="M760 300 L840 760 M840 300 L760 760 M710 470 H890" opacity="0.75"/>
+  </g>
+  <text x="110" y="170" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="74" font-weight="900">Archive frame 02</text>
+  <text x="116" y="250" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="700">Geo clue: Broadway signs</text>
+  <text x="116" y="310" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="700">Time clue: wartime crowd / 1940s dress</text>
+  <text x="116" y="920" fill="#facc15" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="800">Curated placeholder · verify against source before approval</text>
+</svg>
