@@ -40,6 +40,7 @@ export async function POST(request: Request) {
     .select('*')
     .eq('id', body.roundId)
     .eq('approved', true)
+    .eq('status', 'approved')
     .single();
 
   if (error || !round) {

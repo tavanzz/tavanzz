@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Curated TimeGuessr archive-style placeholder 01">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Curated TimeGuessr archive-style placeholder 20">
   <defs>
     <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#172554"/>
+      <stop offset="0" stop-color="#164e63"/>
       <stop offset="1" stop-color="#020617"/>
     </linearGradient>
     <filter id="soft"><feGaussianBlur stdDeviation="22"/></filter>
@@ -21,8 +21,8 @@
     <path d="M300 835 H1300" opacity="0.7"/>
     <path d="M760 300 L840 760 M840 300 L760 760 M710 470 H890" opacity="0.75"/>
   </g>
-  <text x="110" y="170" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="74" font-weight="900">Archive frame 01</text>
-  <text x="116" y="250" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="700">Geo clue: Iron lattice tower</text>
-  <text x="116" y="310" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="700">Time clue: gas lamps / exhibition halls</text>
+  <text x="110" y="170" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="74" font-weight="900">Archive frame 20</text>
+  <text x="116" y="250" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="700">Geo clue: Harbor skyline</text>
+  <text x="116" y="310" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="700">Time clue: handover flags / 1990s suits</text>
   <text x="116" y="920" fill="#67e8f9" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="800">Curated placeholder · verify against source before approval</text>
 </svg>

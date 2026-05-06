@@ -41,6 +41,12 @@ function isSavedGameState(value: unknown): value is SavedGameState {
   if (!value || typeof value !== 'object') return false;
 
   const candidate = value as Partial<SavedGameState>;
+  const resultIsValid =
+    candidate.result === null ||
+    (typeof candidate.result?.locationName === 'string' &&
+      typeof candidate.result.latitude === 'number' &&
+      typeof candidate.result.longitude === 'number' &&
+      typeof candidate.result.year === 'number');
 
   return (
     typeof candidate.round?.id === 'string' &&
@@ -48,7 +54,7 @@ function isSavedGameState(value: unknown): value is SavedGameState {
     typeof candidate.yearGuess === 'number' &&
     ('guess' in candidate) &&
     ('score' in candidate) &&
-    ('result' in candidate)
+    resultIsValid
   );
 }
 

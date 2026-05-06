@@ -19,7 +19,9 @@ export default function ResultPanel({ result, guess, yearGuess, score }: ResultP
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-200">Risultato</p>
           <h2 className="mt-2 text-3xl font-black text-white">{formatScore(score.totalScore)} punti</h2>
-          <p className="mt-1 text-lg font-bold text-emerald-100">{result.locationName}</p>
+          <p className="mt-1 text-lg font-bold text-emerald-100">
+            {result.locationName}{result.country ? `, ${result.country}` : ''}
+          </p>
         </div>
         <div className="rounded-2xl bg-slate-950/60 px-4 py-3 text-sm text-slate-200">
           Guess: {formatCoordinate(guess.latitude)}, {formatCoordinate(guess.longitude)} · {yearGuess}
@@ -36,7 +38,14 @@ export default function ResultPanel({ result, guess, yearGuess, score }: ResultP
         <ResultItem label="Score temporale" value={formatScore(score.yearScore)} />
       </dl>
 
-      <p className="mt-6 rounded-2xl bg-slate-950/50 p-4 leading-7 text-slate-200">{result.explanation ?? 'Nessuna spiegazione disponibile per questo round.'}</p>
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <ClueBlock title="Geo clues" value={result.geoClues} />
+        <ClueBlock title="Time clues" value={result.timeClues} />
+      </div>
+
+      <p className="mt-6 rounded-2xl bg-slate-950/50 p-4 leading-7 text-slate-200">
+        {result.explanation ?? 'Nessuna spiegazione disponibile per questo round.'}
+      </p>
     </section>
   );
 }
@@ -46,6 +55,15 @@ function ResultItem({ label, value }: { label: string; value: string }) {
     <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
       <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{label}</dt>
       <dd className="mt-2 text-lg font-bold text-white">{value}</dd>
+    </div>
+  );
+}
+
+function ClueBlock({ title, value }: { title: string; value: string | null }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+      <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{title}</h3>
+      <p className="mt-2 leading-7 text-slate-200">{value || 'Nessun indizio curato disponibile.'}</p>
     </div>
   );
 }

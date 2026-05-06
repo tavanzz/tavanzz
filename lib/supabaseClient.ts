@@ -1,5 +1,8 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
+export type RoundStatus = 'draft' | 'approved' | 'rejected';
+export type RoundSourceType = 'manual' | 'ai' | 'archive';
+
 export type RoundRow = {
   id: string;
   location_name: string;
@@ -9,6 +12,11 @@ export type RoundRow = {
   year: number;
   image_url: string;
   explanation: string | null;
+  geo_clues: string | null;
+  time_clues: string | null;
+  validation_notes: string | null;
+  status: RoundStatus;
+  source_type: RoundSourceType;
   difficulty: number;
   approved: boolean;
   created_at: string;
@@ -23,6 +31,11 @@ export type RoundInsert = {
   year: number;
   image_url: string;
   explanation?: string | null;
+  geo_clues?: string | null;
+  time_clues?: string | null;
+  validation_notes?: string | null;
+  status?: RoundStatus;
+  source_type?: RoundSourceType;
   difficulty?: number;
   approved?: boolean;
   created_at?: string;

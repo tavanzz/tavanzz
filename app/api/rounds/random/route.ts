@@ -4,7 +4,7 @@ import { getSupabaseClient } from '@/lib/supabaseClient';
 
 export async function GET() {
   const supabase = getSupabaseClient();
-  const { data, error } = await supabase.from('rounds').select('id,image_url').eq('approved', true);
+  const { data, error } = await supabase.from('rounds').select('id,image_url').eq('approved', true).eq('status', 'approved');
 
   if (error) {
     return NextResponse.json({ error: 'Unable to load rounds.' }, { status: 500 });

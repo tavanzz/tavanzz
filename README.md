@@ -16,8 +16,9 @@ TimeGuessr è una web app MVP in stile guessing game: osservi un’immagine, sce
 1. Crea un progetto Supabase.
 2. Apri l’SQL editor di Supabase.
 3. Esegui il contenuto di `schema.sql` per creare la tabella `rounds`.
-4. Crea almeno un round con `approved = true` dalla pagina `/admin` o direttamente da Supabase.
-5. Copia URL progetto e anon key nelle variabili ambiente locali.
+4. Esegui facoltativamente `seed.sql` per inserire 20 round demo curati manualmente e già approvati.
+5. Crea o modifica round dalla pagina `/admin`; pubblica solo round con `status = approved` e `approved = true`.
+6. Copia URL progetto e anon key nelle variabili ambiente locali.
 
 Crea un file `.env.local` nella root del progetto:
 
@@ -46,7 +47,20 @@ Poi apri [http://localhost:3000](http://localhost:3000) nel browser.
 
 - `/` landing minimale
 - `/play` gioco con round casuali approvati
-- `/admin` creazione e modifica round
+- `/admin` creazione, modifica, validazione e approvazione/rifiuto round
+
+
+## Workflow curatoriale round
+
+La tabella `rounds` include campi pensati per revisione manuale:
+
+- `geo_clues`: indizi geografici visibili o attesi nell’immagine.
+- `time_clues`: indizi temporali come abiti, veicoli, tecnologia, segnaletica o architettura.
+- `validation_notes`: note di controllo su anacronismi, clima, architettura, segnaletica e coerenza storica.
+- `status`: `draft`, `approved` o `rejected`.
+- `source_type`: `manual`, `ai` o `archive`.
+
+I round creati o generati devono partire come `draft`; la pagina `/admin` consente di approvare o rifiutare manualmente dopo la validazione curatoriale.
 
 ## Comandi utili
 
@@ -58,7 +72,7 @@ npm run build
 ## Gameplay
 
 1. Vai su `/play`.
-2. Il gioco carica da Supabase un round casuale con `approved = true`, esponendo al browser solo i dati pubblici necessari prima del guess.
+2. Il gioco carica da Supabase un round casuale con `status = approved` e `approved = true`, esponendo al browser solo i dati pubblici necessari prima del guess.
 3. Osserva l’immagine del round.
 4. Clicca sulla mappa per impostare un solo marker di guess.
 5. Scegli l’anno con lo slider.

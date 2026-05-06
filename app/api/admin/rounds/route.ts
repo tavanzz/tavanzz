@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server';
-import { toAdminRound, toRoundInsert, toRoundUpdate, type RoundFormPayload } from '@/lib/rounds';
+import {
+  roundSourceTypes,
+  roundStatuses,
+  toAdminRound,
+  toRoundInsert,
+  toRoundUpdate,
+  type RoundFormPayload,
+} from '@/lib/rounds';
 import { isValidLatitude, isValidLongitude } from '@/lib/scoring';
 import { getSupabaseClient } from '@/lib/supabaseClient';
+import type { RoundSourceType, RoundStatus } from '@/lib/supabaseClient';
 
 type AdminRoundRequestBody = Partial<RoundFormPayload> & {
   id?: unknown;
@@ -12,6 +20,10 @@ const isOptionalString = (value: unknown): value is string => typeof value === '
 const isValidYear = (value: unknown): value is number => Number.isInteger(value) && Number.isFinite(value);
 const isValidDifficulty = (value: unknown): value is number =>
   Number.isInteger(value) && Number.isFinite(value) && value >= 1 && value <= 5;
+const isValidStatus = (value: unknown): value is RoundStatus =>
+  typeof value === 'string' && roundStatuses.includes(value as RoundStatus);
+const isValidSourceType = (value: unknown): value is RoundSourceType =>
+  typeof value === 'string' && roundSourceTypes.includes(value as RoundSourceType);
 
 function parsePayload(body: AdminRoundRequestBody): RoundFormPayload | { error: string } {
   if (!isNonEmptyString(body.locationName)) return { error: 'locationName is required.' };
@@ -21,6 +33,11 @@ function parsePayload(body: AdminRoundRequestBody): RoundFormPayload | { error: 
   if (!isValidYear(body.year)) return { error: 'year must be an integer.' };
   if (!isNonEmptyString(body.imageUrl)) return { error: 'imageUrl is required.' };
   if (!isOptionalString(body.explanation)) return { error: 'explanation must be a string.' };
+  if (!isOptionalString(body.geoClues)) return { error: 'geoClues must be a string.' };
+  if (!isOptionalString(body.timeClues)) return { error: 'timeClues must be a string.' };
+  if (!isOptionalString(body.validationNotes)) return { error: 'validationNotes must be a string.' };
+  if (!isValidStatus(body.status)) return { error: 'status must be draft, approved, or rejected.' };
+  if (!isValidSourceType(body.sourceType)) return { error: 'sourceType must be manual, ai, or archive.' };
   if (!isValidDifficulty(body.difficulty)) return { error: 'difficulty must be an integer from 1 to 5.' };
   if (typeof body.approved !== 'boolean') return { error: 'approved must be boolean.' };
 
@@ -32,6 +49,11 @@ function parsePayload(body: AdminRoundRequestBody): RoundFormPayload | { error: 
     year: body.year,
     imageUrl: body.imageUrl,
     explanation: body.explanation,
+    geoClues: body.geoClues,
+    timeClues: body.timeClues,
+    validationNotes: body.validationNotes,
+    status: body.status,
+    sourceType: body.sourceType,
     difficulty: body.difficulty,
     approved: body.approved,
   };
