@@ -17,6 +17,7 @@ const GuessMap = dynamic(() => import('@/components/GuessMap'), {
 });
 
 const GAME_STATE_KEY = 'timeguessr:game-state';
+const GAME_STATE_VERSION = 'rounds-v3-png-20';
 
 type GuessResponse = {
   correctLat: number;
@@ -39,6 +40,7 @@ type RandomRoundResponse = {
 };
 
 type SavedGameState = {
+  version: string;
   round: PublicRound;
   guess: LatLng | null;
   yearGuess: number;
@@ -48,10 +50,34 @@ type SavedGameState = {
 
 const defaultYearGuess = 1975;
 
+function getSavedRoundImageUrl(round: unknown) {
+  if (!round || typeof round !== 'object') return null;
+
+  const candidate = round as { imageUrl?: unknown; image_url?: unknown };
+  if (typeof candidate.imageUrl === 'string') return candidate.imageUrl;
+  if (typeof candidate.image_url === 'string') return candidate.image_url;
+
+  return null;
+}
+
+function isCurrentPngRoundImage(imageUrl: string) {
+  const normalizedImageUrl = imageUrl.toLowerCase();
+
+  return (
+    normalizedImageUrl.endsWith('.png') &&
+    !normalizedImageUrl.includes('picsum') &&
+    !normalizedImageUrl.includes('placeholder') &&
+    !normalizedImageUrl.includes('.svg') &&
+    !normalizedImageUrl.includes('.jpg') &&
+    !normalizedImageUrl.includes('/rounds/round-')
+  );
+}
+
 function isSavedGameState(value: unknown): value is SavedGameState {
   if (!value || typeof value !== 'object') return false;
 
   const candidate = value as Partial<SavedGameState>;
+  const savedImageUrl = getSavedRoundImageUrl(candidate.round);
   const resultIsValid =
     candidate.result === null ||
     (typeof candidate.result?.locationName === 'string' &&
@@ -60,8 +86,12 @@ function isSavedGameState(value: unknown): value is SavedGameState {
       typeof candidate.result.year === 'number');
 
   return (
+    candidate.version === GAME_STATE_VERSION &&
     typeof candidate.round?.id === 'string' &&
+    candidate.round.id.trim().length > 0 &&
     typeof candidate.round.imageUrl === 'string' &&
+    typeof savedImageUrl === 'string' &&
+    isCurrentPngRoundImage(savedImageUrl) &&
     typeof candidate.yearGuess === 'number' &&
     ('guess' in candidate) &&
     ('score' in candidate) &&
@@ -93,6 +123,12 @@ export default function PlayGame() {
       }
 
       const data = (await response.json()) as RandomRoundResponse;
+
+      if (!data.round?.id || !isCurrentPngRoundImage(data.round.imageUrl)) {
+        throw new Error('Round non valido ricevuto da Supabase.');
+      }
+
+      console.info('Loaded fresh round from /api/rounds/random', data.round.id);
       setRound(data.round);
       setGuess(null);
       setYearGuess(defaultYearGuess);
@@ -126,6 +162,7 @@ export default function PlayGame() {
         // Ignore corrupt saved game state and start a fresh round.
       }
 
+      console.info('Discarded stale game state');
       window.localStorage.removeItem(GAME_STATE_KEY);
     }
 
@@ -136,6 +173,7 @@ export default function PlayGame() {
     if (!round || isLoadingRound) return;
 
     const state: SavedGameState = {
+      version: GAME_STATE_VERSION,
       round,
       guess,
       yearGuess,
@@ -196,6 +234,17 @@ export default function PlayGame() {
   };
 
   const playAgain = () => {
+    window.localStorage.removeItem(GAME_STATE_KEY);
+    void loadRandomRound();
+  };
+
+  const restartGame = () => {
+    window.localStorage.removeItem(GAME_STATE_KEY);
+    setRound(null);
+    setGuess(null);
+    setYearGuess(defaultYearGuess);
+    setScore(null);
+    setResult(null);
     void loadRandomRound();
   };
 
@@ -272,9 +321,16 @@ export default function PlayGame() {
               onClick={playAgain}
               className="w-full rounded-2xl border border-white/15 px-6 py-3 font-bold text-white transition hover:bg-white/10"
             >
-              Nuovo round
+              Next round
             </button>
           ) : null}
+          <button
+            type="button"
+            onClick={restartGame}
+            className="w-full rounded-2xl border border-white/10 px-6 py-3 text-sm font-bold text-slate-300 transition hover:bg-white/10 hover:text-white"
+          >
+            Restart game
+          </button>
         </aside>
       </div>
 
