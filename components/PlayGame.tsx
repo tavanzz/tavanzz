@@ -50,6 +50,10 @@ type SavedGameState = {
 
 const defaultYearGuess = 1975;
 
+function getRoundImageFilename(imageUrl: string) {
+  return imageUrl.split('/').filter(Boolean).pop() ?? imageUrl;
+}
+
 function getSavedRoundImageUrl(round: unknown) {
   if (!round || typeof round !== 'object') return null;
 
@@ -108,18 +112,20 @@ export default function PlayGame() {
   const [isLoadingRound, setIsLoadingRound] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isRoundImageMissing, setIsRoundImageMissing] = useState(false);
 
   const hasSubmitted = score !== null && result !== null;
 
-  const loadRandomRound = useCallback(async () => {
+  const loadRandomRound = useCallback(async (fallbackErrorMessage = 'Errore durante il caricamento del round.') => {
     setIsLoadingRound(true);
     setError(null);
+    setIsRoundImageMissing(false);
 
     try {
       const response = await fetch('/api/rounds/random', { cache: 'no-store' });
 
       if (!response.ok) {
-        throw new Error('Nessun round approvato disponibile.');
+        throw new Error(fallbackErrorMessage);
       }
 
       const data = (await response.json()) as RandomRoundResponse;
@@ -129,6 +135,7 @@ export default function PlayGame() {
       }
 
       console.info('Loaded fresh round from /api/rounds/random', data.round.id);
+      setIsRoundImageMissing(false);
       setRound(data.round);
       setGuess(null);
       setYearGuess(defaultYearGuess);
@@ -136,7 +143,13 @@ export default function PlayGame() {
       setResult(null);
       window.localStorage.removeItem(GAME_STATE_KEY);
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : 'Errore durante il caricamento del round.');
+      setError(
+        fallbackErrorMessage === 'Unable to load next round.'
+          ? fallbackErrorMessage
+          : loadError instanceof Error
+            ? loadError.message
+            : fallbackErrorMessage,
+      );
     } finally {
       setIsLoadingRound(false);
     }
@@ -150,6 +163,7 @@ export default function PlayGame() {
         const parsedState = JSON.parse(savedState) as unknown;
 
         if (isSavedGameState(parsedState)) {
+          setIsRoundImageMissing(false);
           setRound(parsedState.round);
           setGuess(parsedState.guess);
           setYearGuess(parsedState.yearGuess);
@@ -235,7 +249,7 @@ export default function PlayGame() {
 
   const playAgain = () => {
     window.localStorage.removeItem(GAME_STATE_KEY);
-    void loadRandomRound();
+    void loadRandomRound('Unable to load next round.');
   };
 
   const restartGame = () => {
@@ -245,6 +259,7 @@ export default function PlayGame() {
     setYearGuess(defaultYearGuess);
     setScore(null);
     setResult(null);
+    setIsRoundImageMissing(false);
     void loadRandomRound();
   };
 
@@ -280,12 +295,19 @@ export default function PlayGame() {
               <p className="text-sm font-semibold uppercase tracking-[0.25em] text-slate-400">Osserva</p>
               <h2 className="mt-1 text-2xl font-bold text-white">Round misterioso</h2>
             </div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={round.imageUrl}
-              alt="Immagine demo del round da indovinare"
-              className="aspect-[16/10] w-full object-cover"
-            />
+            {isRoundImageMissing ? (
+              <div className="flex aspect-[16/10] w-full items-center justify-center bg-slate-950 p-6 text-center text-sm font-bold text-amber-100">
+                Image missing: add /public/rounds/{getRoundImageFilename(round.imageUrl)}
+              </div>
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={round.imageUrl}
+                alt="Round image to guess"
+                className="aspect-[16/10] w-full object-cover"
+                onError={() => setIsRoundImageMissing(true)}
+              />
+            )}
           </div>
 
           <GuessMap
