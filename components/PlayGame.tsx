@@ -19,8 +19,19 @@ const GuessMap = dynamic(() => import('@/components/GuessMap'), {
 const GAME_STATE_KEY = 'timeguessr:game-state';
 
 type GuessResponse = {
-  result: RoundResult;
-  score: ScoreBreakdown;
+  correctLat: number;
+  correctLng: number;
+  correctYear: number;
+  locationName: string;
+  country: string | null;
+  distanceKm: number;
+  yearError: number;
+  geoScore: number;
+  yearScore: number;
+  totalScore: number;
+  explanation: string | null;
+  geoClues: string[];
+  timeClues: string[];
 };
 
 type RandomRoundResponse = {
@@ -147,9 +158,9 @@ export default function PlayGame() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           roundId: round.id,
-          latitude: guess.latitude,
-          longitude: guess.longitude,
-          yearGuess,
+          guessedLat: guess.latitude,
+          guessedLng: guess.longitude,
+          guessedYear: yearGuess,
         }),
       });
 
@@ -158,8 +169,25 @@ export default function PlayGame() {
       }
 
       const data = (await response.json()) as GuessResponse;
-      setResult(data.result);
-      setScore(data.score);
+      setResult({
+        locationName: data.locationName,
+        country: data.country,
+        latitude: data.correctLat,
+        longitude: data.correctLng,
+        year: data.correctYear,
+        explanation: data.explanation,
+        geoClues: data.geoClues.join('\n'),
+        timeClues: data.timeClues.join('\n'),
+        validationNotes: null,
+        difficulty: 1,
+      });
+      setScore({
+        distanceKm: data.distanceKm,
+        yearError: data.yearError,
+        geoScore: data.geoScore,
+        yearScore: data.yearScore,
+        totalScore: data.totalScore,
+      });
     } catch (submissionError) {
       setError(submissionError instanceof Error ? submissionError.message : 'Errore inatteso. Riprova.');
     } finally {
